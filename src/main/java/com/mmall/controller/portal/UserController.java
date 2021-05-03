@@ -5,7 +5,6 @@ import com.mmall.common.ResponseCode;
 import com.mmall.common.ServerResponse;
 import com.mmall.pojo.User;
 import com.mmall.service.IUserService;
-import net.sf.jsqlparser.schema.Server;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +13,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
 
+/**
+ * 用户模块操作
+ * @achao
+ */
 @Controller
 @RequestMapping("/user/")
 public class UserController {
@@ -78,7 +81,7 @@ public class UserController {
     }
 
     /**
-     * 获取登录信息
+     * 获取用户登录信息
      *
      * @param session
      * @return
@@ -106,7 +109,7 @@ public class UserController {
     }
 
     /**
-     * 校验回答找回密码问题回答是否正确
+     * 校验找回密码问题的回答是否正确
      *
      * @param username
      * @param question
@@ -127,9 +130,9 @@ public class UserController {
      * @param forgetToken
      * @return
      */
-    @RequestMapping(value = "forget_rest_password.do", method = RequestMethod.POST)
+    @RequestMapping(value = "forget_reset_password.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> forgetRestPassword(String username, String newPassword, String forgetToken) {
+    public ServerResponse<String> forgetResetPassword(String username, String newPassword, String forgetToken) {
         return iUserService.forgetResetPassword(username, newPassword, forgetToken);
     }
 
@@ -141,7 +144,7 @@ public class UserController {
      * @param passwordNew
      * @return
      */
-    @RequestMapping(value = "rest_password.do", method = RequestMethod.POST)
+    @RequestMapping(value = "reset_password.do", method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<String> resetPassword(HttpSession session, String passwordOld, String passwordNew) {
         User user = (User) session.getAttribute(Const.CURRENT_USER);
@@ -160,14 +163,11 @@ public class UserController {
     @RequestMapping(value = "update_information.do", method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<User> updateInformation(HttpSession session, User user) {
-        User currentUser = (User) session.getAttribute(Const.CURRENT_USER);
-        if (currentUser == null) {
+        User sessionUser = (User) session.getAttribute(Const.CURRENT_USER);
+        if (sessionUser == null) {
             return ServerResponse.createByErrorMessage("用户未登录");
         }
-        user.setId(currentUser.getId());
-        user.setUsername(currentUser.getUsername());
-        user.setUpdateTime(currentUser.getUpdateTime());
-        ServerResponse<User> response = iUserService.updateInformation(user);
+        ServerResponse<User> response = iUserService.updateInformation(sessionUser,user);
         if (response.isSuccess()) {
             session.setAttribute(Const.CURRENT_USER, response.getData());
         }
@@ -184,7 +184,7 @@ public class UserController {
     public ServerResponse<User> getInformation(HttpSession session){
         User currentUser = (User) session.getAttribute(Const.CURRENT_USER);
         if (currentUser == null) {
-            return ServerResponse.crateByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),"未登录需要强制登录status=10");
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),"未登录需要强制登录status=10");
         }
         return iUserService.getInformation(currentUser.getId());
     }

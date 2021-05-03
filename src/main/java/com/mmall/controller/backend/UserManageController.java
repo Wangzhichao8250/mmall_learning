@@ -12,8 +12,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
 
+/**
+ * 管理员模块操作
+ * @achao
+ */
 @Controller
-@RequestMapping("/manage/user")
+@RequestMapping("/manage/user/")
 public class UserManageController {
 
     @Autowired

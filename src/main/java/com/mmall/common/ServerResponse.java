@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 //保证序列化json的时候，如果是null的对象，key也会消失
-public class ServerResponse<T> implements Serializable {
+public class ServerResponse<T> {
 
     private int status;
     private String msg;
@@ -37,6 +37,7 @@ public class ServerResponse<T> implements Serializable {
     public boolean isSuccess() {
         return this.status == ResponseCode.SUCCESS.getCode();
     }
+
 
     public int getStatus() {
         return status;
@@ -80,7 +81,7 @@ public class ServerResponse<T> implements Serializable {
         return new ServerResponse<T>(ResponseCode.ERROR.getCode(), errorMessage);
     }
 
-    public static <T> ServerResponse<T> crateByErrorCodeMessage(int errorCode, String errorMessage) {
+    public static <T> ServerResponse<T> createByErrorCodeMessage(int errorCode, String errorMessage) {
         return new ServerResponse<T>(errorCode, errorMessage);
     }
 
